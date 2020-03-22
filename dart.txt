@@ -1,0 +1,138 @@
+import 'dart:convert';
+
+void main() async {
+  String nombre = 'Andres Cardona';
+  int edad = 34;
+  double estatura = 1.80;
+  bool estado = true;
+  List dias = ['Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes'];
+  dias.add('Sabado');
+  List<String> ingreso = List(2);
+  ingreso[0] = '07:00 AM';
+  ingreso[1] = '02:00 PM';
+
+  // Tipos de dato clave, valor
+  Map<String, dynamic> proyectos = {
+    'Proyecto': 'SICDI',
+    'Metodologia': 'Scrum',
+    'Integrantes': 7
+  };
+  proyectos.addAll({'Categoria': 'Software'});
+  //estado = !estado;
+  //print('Hola Mundo: ' + nombre);
+  //print('Bienvenido: $nombre, tienes $edad años y mides $estatura metros');
+  
+  //uso de clases abstractas
+  final emp = new empleado();
+  emp.nombre = 'Jorge';
+  emp.apellido = 'cardona';
+  emp.datos();
+  
+  //uso de clases con extends y mixings(herencia multiple)
+  final pas = pasante();
+  pas.nombre = 'Maria';
+  pas.apellido = 'Garcia';
+  pas.universidad = 'Uniminuto';
+  pas.datos();
+ 
+  // uso de sync await - tareas en segundo plano
+  print ('Agregando pasante al proyecto...');
+  String user = await crea_user(true);
+  print (user);
+  
+  print('Trabaja los dias: ${dias.getRange(3, 6)}');
+  print('Horario de Ingreso: ${ingreso[0]}');
+  print('Trabaja en el Proyecto: ${proyectos['Proyecto']}');
+
+  //Esta forma de creacion de objeto necesita parametros del constructor en llaves
+  //final tarea = new Desarrollo(componente: 'Login', funcionalidad: 'Validaciones');
+  final tarea = new Desarrollo('Login', 'Validaciones');
+  print(tarea);
+
+  //recibir datos de un Json
+  /*final rawJson = '{ "componente" : "login" , "funcionalidad" : "validaciones" }';
+  Map parsedJson = json.decode(rawJson); //onvertir a tipo map
+  final tarea1 = new Desarrollo.fromJson(parsedJson);
+  print(tarea1);*/
+
+  final horario = new Disponibilidad();
+  horario.hxdia = 3.5;
+  print(horario);
+  print('Disponibilidad semanal: ${horario.hxsemana} horas');
+
+  String mensaje1 = despedir(nombre);
+  //String mensaje2 = despedir2(nombre: 'Andres');
+  print(mensaje1);
+  //print(mensaje2);
+}
+
+//Funciones
+String despedir(String nombre) {
+  return 'Sesion Finalizada => $nombre';
+}
+
+String despedir2({String nombre}) => 'Sesion Finalizada => $nombre';
+
+Future<String> crea_user(bool estado){ 
+  if (estado) {
+    return Future.delayed(new Duration (seconds: 4), () {
+      return 'Usuario creado satisfactoriamente';
+    });
+  }
+}
+
+//clases
+class Desarrollo {
+  String componente;
+  String funcionalidad;
+
+  Desarrollo(this.componente, this.funcionalidad); //constructor
+  Desarrollo.fromJson(Map parsedJson) {
+    //constructor con nombre
+    componente = parsedJson['componente'];
+    funcionalidad = parsedJson['funcionalidad'];
+  }
+  //funcion retorna valores
+  String toString() => 'Tarea Asignada: $componente - $funcionalidad';
+}
+
+class Disponibilidad {
+  double _hxdia;
+  double _hxsemana;
+
+  //setters establecer informacion
+  set hxdia(double valor) { 
+    if (valor <= 0) {
+      throw ('Debe ingresar unnumero de horas valido');
+    }
+    _hxdia = valor;  
+  }
+  
+  //getters obtener informacion
+  double get hxsemana => _hxsemana = _hxdia*5; 
+
+  String toString() => 'Disponibilidad diaria: $_hxdia horas';
+}
+
+//clases abstractas definen la estructura de las demas
+abstract class persona{
+  String nombre;
+  String apellido;
+}
+abstract class convenio{
+  String universidad;
+}
+//clase que implementa a partir de persona
+//requiere declarar las variables de persona 
+class empleado implements persona{
+  String nombre;
+  String apellido;
+  String departamento;
+  void datos() => print('Director: $nombre $apellido');
+}
+//clase que hereda de persona
+//no requiere declarar variables de persona
+class pasante extends persona with convenio{
+  void datos() => print('Pasante: $nombre $apellido - $universidad');
+}
+
